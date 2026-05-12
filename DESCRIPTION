@@ -1,7 +1,7 @@
 Package: opencis
 Type: Package
 Title: Import Data from Spanish Sociological Research Center (CIS)
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Héctor", "Meleiro", email = "hmeleiros@gmail.com", role = c("aut", "cre"))
   )
@@ -20,6 +20,7 @@ Imports: httr (>= 1.4.7), tibble (>= 3.0.0), purrr (>= 1.0.0), haven
         (>= 2.5.3), magrittr (>= 2.0.0), rvest (>= 1.0.0), stringr (>=
         1.0.0), memoise (>= 2.0.0)
 URL: https://opencis.spainelectoralproject.com,
+        https://CRAN.R-project.org/package=opencis,
         https://github.com/hmeleiro/opencis
 BugReports: https://github.com/hmeleiro/opencis/issues
 Suggests: knitr, testthat (>= 3.0.0), rmarkdown
@@ -27,8 +28,8 @@ VignetteBuilder: knitr
 Config/Needs/website: hmeleiro/spainelectoraltheme
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2026-04-29 07:47:02 UTC; hmele
+Packaged: 2026-05-12 09:12:23 UTC; hmele
 Author: Héctor Meleiro [aut, cre]
 Maintainer: Héctor Meleiro <hmeleiros@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-04-29 19:10:07 UTC
+Date/Publication: 2026-05-12 18:40:25 UTC

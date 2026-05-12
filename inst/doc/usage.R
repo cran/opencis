@@ -6,7 +6,10 @@ knitr::opts_chunk$set(
 
 
 ## ----eval=FALSE---------------------------------------------------------------
-# devtools::install_github("hmeleiro/opencis")
+# install.packages("opencis")
+
+## ----eval=FALSE---------------------------------------------------------------
+# remotes::install_github("hmeleiro/opencis")
 
 ## ----eval = FALSE-------------------------------------------------------------
 # library(opencis)

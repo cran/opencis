@@ -1,4 +1,4 @@
-bd28f29a20b1ecba923773a5ee2e73b6 *DESCRIPTION
+d82eb5e67f8cc044fac4f78a48bfa9e6 *DESCRIPTION
 422c78ecd3a1ea215cc0be068f5a318c *NAMESPACE
 2f1dacee24eb2be7e9e645cfd577c5f6 *R/examples/browse_pdf.R
 727ea8054261fd951c179a985814f636 *R/examples/download_study.R
@@ -11,19 +11,20 @@ b1014fdf9d71943604a53394c57f5223 *R/http.R
 201692737c135ce0c217fc3b7940db49 *R/imports.R
 df6cc46bc7fae1a55b713f3d5065b35a *R/opencis-package.R
 c5431db5f8e84a25cb88c2aa8b28a144 *R/read.R
-eeaf86a37db004c7bea3394ba49b06e9 *R/search.R
+74458c46300b206c81420272b4beb9a1 *R/search.R
 aa63102d5268fb61bdf56e69393a74f2 *R/zzz.R
-36f05138c51625edfd3bf374bbbedd44 *README.md
+eb2f39793a479c991ca16116dc8ee496 *README.md
 a17be869d275ffa61505aef573e5e67e *build/vignette.rds
 f81ef431a71f33f4feff125225b45f8e *inst/WORDLIST
-e0aa2579ac5cd099203bd12ee887cb27 *inst/doc/usage.R
-5adc5bbf43edf9650d8c7574f573f4a7 *inst/doc/usage.Rmd
-f77e95c0aa4560a174d2201042422215 *inst/doc/usage.html
+7bb58b2b59d5c3103f446c80d8e789ac *inst/doc/usage.R
+787b98d01e4773485c1b9e5c702d0378 *inst/doc/usage.Rmd
+ff8dac47d753f54ff441e4320e7ad4df *inst/doc/usage.html
 608153286fd66bc396a2678ede2c5513 *man/browse_pdf.Rd
 4a13c1a143c917ad857046b3b701ca91 *man/cis_catalog_url_date.Rd
 c24f9027ae3901743f22d0725fe7fd58 *man/clear_cache.Rd
 14ad8eebf049ce6c67bcbfa7f1094ba5 *man/download_file.Rd
 6a488e0f73056e6d75b6cd436db3b446 *man/download_study.Rd
+1fe2da8f58a4ac91ffb97d244505f336 *man/figures/logo.png
 f157f1d500cdc0a71eb1d3928d867b93 *man/find_url.Rd
 cf4ac7a39f8fb49f29b4fe1e50c739e3 *man/get_data_dictionary.Rd
 d056e3629853ee4f62f3044823996498 *man/get_metadata.Rd
@@ -42,4 +43,4 @@ f6bc780f23ec096b6a7725397da7cb21 *man/search_cis.Rd
 844ca638518343e517c26e923a674627 *tests/testthat/test-cis_catalog_url_date.R
 ed8772ab8ad1232ad45d555c70106f19 *tests/testthat/test-find_url.R
 91112653612f5775586dfc7e7411e6b9 *tests/testthat/test-get_data_dictionary.R
-5adc5bbf43edf9650d8c7574f573f4a7 *vignettes/usage.Rmd
+787b98d01e4773485c1b9e5c702d0378 *vignettes/usage.Rmd
