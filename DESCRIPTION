@@ -1,7 +1,7 @@
 Package: opencis
 Type: Package
 Title: Import Data from Spanish Sociological Research Center (CIS)
-Version: 0.1.2
+Version: 0.1.4
 Authors@R: c(
     person("Héctor", "Meleiro", email = "hmeleiros@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0009-0003-4468-2197"))
   )
@@ -29,9 +29,9 @@ VignetteBuilder: knitr
 Config/Needs/website: hmeleiro/spainelectoraltheme
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2026-09-07 14:16:16 UTC; hmele
+Packaged: 2026-10-01 10:53:17 UTC; hmele
 Author: Héctor Meleiro [aut, cre] (ORCID:
     <https://orcid.org/0009-0003-4468-2197>)
 Maintainer: Héctor Meleiro <hmeleiros@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-09-07 18:30:14 UTC
+Date/Publication: 2026-10-01 15:40:21 UTC

@@ -1,3 +1,46 @@
+# opencis 0.1.4
+
+## Improvements
+
+* Documented the CIS advanced Lucene search syntax supported by `search_cis()`
+  and `search_all_cis()`, including Boolean, exact-phrase, exclusion, range,
+  boosting, and field-specific query examples. Advanced queries can be passed
+  directly through `q` by starting them with `*`; the package handles URL
+  encoding.
+
+## Bug fixes
+
+* Fixed parsing of question and time-series search results after the CIS changed
+  the order of their metadata fields. Time-series results now also include the
+  numeric `data_points` field reported by the catalog.
+
+* Added regression tests for question and time-series search result parsing and
+  for preserving advanced Lucene expressions when catalog URLs are built.
+
+# opencis 0.1.3
+
+## Improvements
+
+* Network GET requests are now spaced by one second per origin within each R
+  session. HTTP 429 responses retry up to five times, respecting `Retry-After`
+  (seconds or HTTP date) or using exponential backoff with jitter capped at
+  60 seconds. Configure this with `opencis.request_interval` and
+  `opencis.max_retries`. Cached responses do not wait or use the network.
+
+* `search_all_cis()` now distinguishes failed requests from the end of the
+  catalog. It warns explicitly when results are incomplete, returns the rows
+  collected so far with `complete = FALSE` and `next_page` attributes, and
+  accepts `start` to resume with the same filters. Successful searches have
+  `complete = TRUE`.
+
+## Bug fixes
+
+* Failed `search_cis()` calls are no longer memoised, allowing later calls to
+  retry the failed page. Successful HTTP responses retain the disk cache.
+
+* Added regression tests for rate limiting, retry exhaustion, `Retry-After`
+  parsing, retries after anti-bot verification, and incomplete search recovery.
+
 # opencis 0.1.2
 
 ## New features

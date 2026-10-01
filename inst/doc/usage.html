@@ -372,30 +372,152 @@ restrict results to a date range with <code>from</code> and
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a></span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co"># Search for data series</span></span>
 <span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="fu">search_cis</span>(<span class="at">q =</span> <span class="st">&quot;situación económica&quot;</span>, <span class="at">catalogo =</span> <span class="st">&quot;serie&quot;</span>)</span></code></pre></div>
+<div id="advanced-search" class="section level4">
+<h4>Advanced search</h4>
+<p>The <code>q</code> argument accepts the <a href="https://www.cis.es/es/estudios/catalogo">advanced Lucene syntax
+supported by the CIS catalog</a>. An advanced expression must start with
+<code>*</code>. Pass the expression as plain text; <code>opencis</code>
+handles URL encoding.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Match any of several study codes</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">search_cis</span>(<span class="at">q =</span> <span class="st">&quot;*surveyCode:(2610 OR 2829 OR 2956)&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Require barometro and 2024 in the title, but exclude sanitario</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="fu">search_cis</span>(<span class="at">q =</span> <span class="st">&quot;*title_es_ES:(+barometro +2024 -sanitario)&quot;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># Search question text and retrieve every result page</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="fu">search_all_cis</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  <span class="at">q =</span> <span class="st">&quot;*question_es_ES:(divorcio)&quot;</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  <span class="at">catalogo =</span> <span class="st">&quot;pregunta&quot;</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co"># Combine fields: questions about divorce from studies after number 3540</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="fu">search_all_cis</span>(</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  <span class="at">q =</span> <span class="st">&quot;*question_es_ES:(divorcio) AND surveyCodeNumber:{3540 TO *]&quot;</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>  <span class="at">catalogo =</span> <span class="st">&quot;pregunta&quot;</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>)</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co"># Search for an exact phrase</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="fu">search_cis</span>(<span class="at">q =</span> <span class="st">&#39;*title_es_ES:&quot;barómetro de la vivienda&quot;&#39;</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co"># Search a numeric study-code range (used in the CIS documentation)</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="fu">search_cis</span>(<span class="at">q =</span> <span class="st">&quot;*(surveyCodeNumber:[3000 TO 3002])&quot;</span>)</span></code></pre></div>
+<p>The CIS documents the following searchable fields. Catalog data are
+currently indexed only in Spanish (<code>es_ES</code>).</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Field</th>
+<th align="left">Indexing</th>
+<th align="left">Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>surveyCode</code></td>
+<td align="left">keyword</td>
+<td align="left">Study code</td>
+</tr>
+<tr class="even">
+<td align="left"><code>questionCode</code></td>
+<td align="left">keyword</td>
+<td align="left">Question code</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>serieCode</code></td>
+<td align="left">keyword</td>
+<td align="left">Series code</td>
+</tr>
+<tr class="even">
+<td align="left"><code>title_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Study, question, or series title</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>description_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Study or series description</td>
+</tr>
+<tr class="even">
+<td align="left"><code>publishDate</code></td>
+<td align="left">text</td>
+<td align="left">Study/question date, or latest series date</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>question_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Study question wording</td>
+</tr>
+<tr class="even">
+<td align="left"><code>questionText_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Study question text</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>descriptors_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Question descriptors</td>
+</tr>
+<tr class="even">
+<td align="left"><code>collections_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Study collection names</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>publications_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Study publication names</td>
+</tr>
+<tr class="even">
+<td align="left"><code>subjectIndexes_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Study subject indexes</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>orders_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Study commissioners</td>
+</tr>
+<tr class="even">
+<td align="left"><code>authors_es_ES</code></td>
+<td align="left">text</td>
+<td align="left">Study authors</td>
+</tr>
+</tbody>
+</table>
+<p>The CIS also uses <code>surveyCodeNumber</code> in its numeric-range
+example, although it is not included in the site’s field table. Treat
+that field as server-specific and potentially less stable than the
+documented list.</p>
+<p>Lucene expressions can combine <code>AND</code>, <code>OR</code>,
+required terms (<code>+</code>), excluded terms (<code>-</code>), quoted
+phrases, ranges, and term boosting with <code>^</code>. Invalid syntax
+may return no results. Advanced searches also use a different relevance
+order from simple searches and do not highlight matches.</p>
 <p>By default <code>search_cis()</code> returns only the first page of
 results. Use <code>search_all_cis()</code> to automatically paginate
 through all pages and get every matching result in a single tibble:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Retrieve all postelectoral studies (all pages)</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>all_studies <span class="ot">&lt;-</span> <span class="fu">search_all_cis</span>(<span class="at">q =</span> <span class="st">&quot;postelectoral&quot;</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">nrow</span>(all_studies))</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co"># Filter by date range across all pages</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>studies <span class="ot">&lt;-</span> <span class="fu">search_all_cis</span>(</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">q    =</span> <span class="st">&quot;ideologia&quot;</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="at">from =</span> <span class="st">&quot;2010-01-01&quot;</span>,</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  <span class="at">to   =</span> <span class="st">&quot;2020-12-31&quot;</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Retrieve all postelectoral studies (all pages)</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>all_studies <span class="ot">&lt;-</span> <span class="fu">search_all_cis</span>(<span class="at">q =</span> <span class="st">&quot;postelectoral&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">nrow</span>(all_studies))</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co"># Filter by date range across all pages</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>studies <span class="ot">&lt;-</span> <span class="fu">search_all_cis</span>(</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">q    =</span> <span class="st">&quot;ideologia&quot;</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="at">from =</span> <span class="st">&quot;2010-01-01&quot;</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="at">to   =</span> <span class="st">&quot;2020-12-31&quot;</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>)</span></code></pre></div>
 <p><code>search_all_cis()</code> accepts the same arguments as
 <code>search_cis()</code>.</p>
 <hr />
+</div>
 </div>
 <div id="reading-study-data-into-r" class="section level3">
 <h3>Reading study data into R</h3>
 <p><code>read_cis()</code> downloads the SPSS data file for a study and
 imports it directly into R as a labelled data frame (via
 <code>haven</code>):</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_cis</span>(<span class="dv">3411</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">print</span>(df)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_cis</span>(<span class="dv">3411</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">print</span>(df)</span></code></pre></div>
 <hr />
 </div>
 <div id="exploring-variables-the-data-dictionary" class="section level3">
@@ -403,15 +525,15 @@ imports it directly into R as a labelled data frame (via
 <p>After loading a study with <code>read_cis()</code>, use
 <code>get_data_dictionary()</code> to obtain a tidy tibble with every
 variable name, its label and its value labels:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>df   <span class="ot">&lt;-</span> <span class="fu">read_cis</span>(<span class="dv">3328</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>dict <span class="ot">&lt;-</span> <span class="fu">get_data_dictionary</span>(df)</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">print</span>(dict)</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co"># Find variables whose label contains a keyword</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>dict[<span class="fu">grepl</span>(<span class="st">&quot;sexo&quot;</span>, dict<span class="sc">$</span>label, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>), ]</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co"># Inspect value labels for a specific variable</span></span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>dict<span class="sc">$</span>value_labels[[<span class="fu">which</span>(dict<span class="sc">$</span>variable <span class="sc">==</span> <span class="st">&quot;SEXO&quot;</span>)]]</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>df   <span class="ot">&lt;-</span> <span class="fu">read_cis</span>(<span class="dv">3328</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>dict <span class="ot">&lt;-</span> <span class="fu">get_data_dictionary</span>(df)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">print</span>(dict)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co"># Find variables whose label contains a keyword</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>dict[<span class="fu">grepl</span>(<span class="st">&quot;sexo&quot;</span>, dict<span class="sc">$</span>label, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>), ]</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co"># Inspect value labels for a specific variable</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>dict<span class="sc">$</span>value_labels[[<span class="fu">which</span>(dict<span class="sc">$</span>variable <span class="sc">==</span> <span class="st">&quot;SEXO&quot;</span>)]]</span></code></pre></div>
 <hr />
 </div>
 <div id="getting-study-metadata" class="section level3">
@@ -420,8 +542,8 @@ variable name, its label and its value labels:</p>
 of a study from the CIS website — field dates, study type, country,
 authorship, thematic indices, etc. — and returns it as a two-column
 tibble (<code>field</code>, <code>value</code>):</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>meta <span class="ot">&lt;-</span> <span class="fu">get_metadata</span>(<span class="dv">3328</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">print</span>(meta)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>meta <span class="ot">&lt;-</span> <span class="fu">get_metadata</span>(<span class="dv">3328</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">print</span>(meta)</span></code></pre></div>
 <hr />
 </div>
 <div id="downloading-the-zip-file-to-disk" class="section level3">
@@ -429,13 +551,13 @@ tibble (<code>field</code>, <code>value</code>):</p>
 <p>If you want to keep the raw data files instead of reading them into a
 temporary directory, use <code>download_study()</code>. It saves the ZIP
 archive to any local folder:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Save to the current working directory</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">download_study</span>(<span class="dv">3328</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Saved to:&quot;</span>, path, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co"># Save to a specific folder</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">download_study</span>(<span class="dv">3328</span>, <span class="at">destdir =</span> <span class="st">&quot;data/raw&quot;</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Saved to:&quot;</span>, path, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Save to the current working directory</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">download_study</span>(<span class="dv">3328</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Saved to:&quot;</span>, path, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co"># Save to a specific folder</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">download_study</span>(<span class="dv">3328</span>, <span class="at">destdir =</span> <span class="st">&quot;data/raw&quot;</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Saved to:&quot;</span>, path, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
 <hr />
 </div>
 <div id="browsing-the-questionnaire-and-technical-sheet" class="section level3">
@@ -449,11 +571,11 @@ default)</li>
 <li><strong>Technical sheet</strong>
 (<code>wanted_file = &quot;ft&quot;</code>)</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Open the questionnaire for study 3328</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">browse_pdf</span>(<span class="dv">3328</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co"># Open the technical sheet</span></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="fu">browse_pdf</span>(<span class="dv">3328</span>, <span class="at">wanted_file =</span> <span class="st">&quot;ft&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Open the questionnaire for study 3328</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">browse_pdf</span>(<span class="dv">3328</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co"># Open the technical sheet</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="fu">browse_pdf</span>(<span class="dv">3328</span>, <span class="at">wanted_file =</span> <span class="st">&quot;ft&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 

@@ -3,7 +3,9 @@
 #' Searches for CIS studies using the CIS search engine.
 #'
 #' @param start Integer. The starting page for the search results. Default is 1, iterate to get more results.
-#' @param q String. The search query. Default is an empty string.
+#' @param q A single character string containing a simple search or an advanced
+#'   Lucene query. Advanced queries must start with `*`; pass them as plain text
+#'   because URL encoding is handled by the package. Default is an empty string.
 #' @param from Date or NULL. The start date for filtering results. Default is NULL. The date format must be "YYYY-MM-DD".
 #' @param to Date or NULL. The end date for filtering results. Default is NULL. The date format must be "YYYY-MM-DD".
 #' @param sort String. The sorting order for the results ("publishDate-", "publishDate+", "relevance").
@@ -12,6 +14,19 @@
 #' @param ... Additional parameters (not used).
 #'
 #' @return A data.frame with the search results.
+#'
+#' @details
+#' The CIS catalog supports advanced Lucene queries when `q` starts with `*`.
+#' These queries can use Boolean operators, exact phrases, exclusions, ranges,
+#' term boosting, and field-specific searches. For example,
+#' `*surveyCode:(2610 OR 2829 OR 2956)` searches for several study codes and
+#' `*title_es_ES:(+barometro +2024 -sanitario)` combines required and excluded
+#' title terms.
+#'
+#' Advanced queries are interpreted by the CIS server. Invalid syntax may
+#' return no results, and relevance ordering can differ from a simple search.
+#' Catalog fields and examples are documented at
+#' <https://www.cis.es/es/estudios/catalogo>.
 #'
 #' @export
 #'
@@ -51,7 +66,7 @@ search_cis <- function(
   return(out)
 }
 
-search_cis <- memoise::memoise(search_cis)
+# Successful HTTP responses are cached by cis_get(). Do not memoise NULL failures.
 
 #' Parse CIS study search results
 #'
@@ -118,9 +133,10 @@ parse_serie <- function(resp) {
 
   card_info <-
     map(card_info, function(x) {
-      from <- html_elements(x, "li")[1]
-      to <- html_elements(x, "li")[2]
-      serie <- html_elements(x, "li")[3]
+      serie <- html_elements(x, "li")[1]
+      from <- html_elements(x, "li")[2]
+      to <- html_elements(x, "li")[3]
+      data_points <- html_elements(x, "li")[4]
 
       from <- html_text(from)
       from <- as.Date(from, "%d/%m/%Y")
@@ -128,10 +144,13 @@ parse_serie <- function(resp) {
       to <- as.Date(to, "%d/%m/%Y")
       serie <- html_text(serie)
       serie <- gsub("^Serie\\s+", "", serie)
-      tibble(serie, from, to)
+      data_points <- html_text(data_points)
+      data_points <- gsub("Puntos ", "", data_points)
+      data_points <- as.numeric(data_points)
+
+      tibble(serie, from, to, data_points)
     }) %>%
     list_rbind()
-
 
   out <- tibble(
     title = titles,
@@ -168,8 +187,8 @@ parse_question <- function(resp) {
 
   card_info <-
     map(card_info, function(x) {
-      date <- html_elements(x, "li")[1]
-      question <- html_elements(x, "li")[2]
+      question <- html_elements(x, "li")[1]
+      date <- html_elements(x, "li")[2]
       date <- html_text(date)
       date <- as.Date(date, "%d/%m/%Y")
       question <- html_text(question)
@@ -231,7 +250,9 @@ get_study_url <- function(study_code) {
 #' Constructs a URL for querying the CIS catalog with optional date range filters.
 #'
 #' @param start Integer. The starting page for the search results. Default is 1, iterate to get more results.
-#' @param q String. The search query. Default is an empty string.
+#' @param q A single character string containing a simple search or an advanced
+#'   Lucene query. Advanced queries must start with `*`; pass them as plain text
+#'   because URL encoding is handled by the package. Default is an empty string.
 #' @param from Date or NULL. The start date for filtering results. Default is NULL
 #' @param to Date or NULL. The end date for filtering results. Default is NULL.
 #' @param sort String. The sorting order for the results ("publishDate-", "publishDate+", "relevance").
@@ -304,7 +325,9 @@ cis_catalog_url_date <- function(
 #' Calls \code{\link{search_cis}} repeatedly, incrementing the page index until
 #' no more results are returned, and returns all results in a single tibble.
 #'
-#' @param q String. The search query. Default is an empty string.
+#' @param q A single character string containing a simple search or an advanced
+#'   Lucene query. Advanced queries must start with `*`; pass them as plain text
+#'   because URL encoding is handled by the package. Default is an empty string.
 #' @param from Date or NULL. The start date for filtering results. Default is NULL.
 #'   The date format must be "YYYY-MM-DD".
 #' @param to Date or NULL. The end date for filtering results. Default is NULL.
@@ -315,8 +338,23 @@ cis_catalog_url_date <- function(
 #' @param catalogo String. The catalog type (\code{"estudio"}, \code{"pregunta"},
 #'   \code{"serie"}). Default is \code{"estudio"}.
 #' @param ... Additional parameters passed to \code{\link{search_cis}}.
+#' @param start Integer. First page to retrieve, default 1. Use the returned
+#'   \code{next_page} attribute to resume an interrupted search with the same filters.
 #'
-#' @return A tibble with all search results across all pages.
+#' @return A tibble with search results and a logical \code{complete} attribute.
+#'   On HTTP failure, warns and returns the collected rows with
+#'   \code{complete = FALSE} and a \code{next_page} attribute for resuming.
+#' @details Network GET requests are spaced by at least one second per origin
+#'   within the R session. Configure this with \code{options(opencis.request_interval = 2)}
+#'   (seconds). HTTP 429 responses are retried up to five times, respecting
+#'   \code{Retry-After} or using exponential backoff with jitter (up to 60 seconds).
+#'   Set \code{options(opencis.max_retries = 8)} to change the retry limit; zero
+#'   disables retries. Cached responses do not wait or use the network.
+#'   Resuming retrieves only the remaining pages; combine them with the saved rows.
+#'   Page positions may change if the remote catalog changes between calls.
+#'
+#'   Advanced Lucene queries supported by [search_cis()] can also be supplied
+#'   through `q`; the same expression is retained across every requested page.
 #'
 #' @export
 #'
@@ -327,10 +365,16 @@ search_all_cis <- function(
   to = NULL,
   sort = "relevance",
   catalogo = "estudio",
-  ...
+  ...,
+  start = 1
 ) {
+  if (!is.numeric(start) || length(start) != 1 || !is.finite(start) ||
+    start < 1 || start != floor(start)) {
+    stop("'start' must be a positive integer.", call. = FALSE)
+  }
   all_results <- list()
-  page <- 1
+  page <- start
+  complete <- TRUE
 
   repeat {
     results <- search_cis(
@@ -343,17 +387,24 @@ search_all_cis <- function(
       ...
     )
 
-    if (is.null(results) || nrow(results) == 0) break
+    if (is.null(results)) {
+      complete <- FALSE
+      warning(sprintf(
+        "Incomplete CIS search: page %s failed. Resume with start = %s and the same filters.",
+        page, page
+      ), call. = FALSE)
+      break
+    }
+    if (nrow(results) == 0) break
 
-    all_results[[page]] <- results
+    all_results[[length(all_results) + 1L]] <- results
     page <- page + 1
   }
 
-  if (length(all_results) == 0) {
-    return(tibble())
-  }
-
-  list_rbind(all_results)
+  out <- if (length(all_results) == 0) tibble() else list_rbind(all_results)
+  attr(out, "complete") <- complete
+  if (!complete) attr(out, "next_page") <- page
+  out
 }
 
 

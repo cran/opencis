@@ -24,6 +24,31 @@ knitr::opts_chunk$set(
 # search_cis(q = "situación económica", catalogo = "serie")
 
 ## ----eval = FALSE-------------------------------------------------------------
+# # Match any of several study codes
+# search_cis(q = "*surveyCode:(2610 OR 2829 OR 2956)")
+# 
+# # Require barometro and 2024 in the title, but exclude sanitario
+# search_cis(q = "*title_es_ES:(+barometro +2024 -sanitario)")
+# 
+# # Search question text and retrieve every result page
+# search_all_cis(
+#   q = "*question_es_ES:(divorcio)",
+#   catalogo = "pregunta"
+# )
+# 
+# # Combine fields: questions about divorce from studies after number 3540
+# search_all_cis(
+#   q = "*question_es_ES:(divorcio) AND surveyCodeNumber:{3540 TO *]",
+#   catalogo = "pregunta"
+# )
+# 
+# # Search for an exact phrase
+# search_cis(q = '*title_es_ES:"barómetro de la vivienda"')
+# 
+# # Search a numeric study-code range (used in the CIS documentation)
+# search_cis(q = "*(surveyCodeNumber:[3000 TO 3002])")
+
+## ----eval = FALSE-------------------------------------------------------------
 # # Retrieve all postelectoral studies (all pages)
 # all_studies <- search_all_cis(q = "postelectoral")
 # print(nrow(all_studies))
